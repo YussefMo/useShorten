@@ -51,11 +51,64 @@ const { shortenedURL, isLoading, errorMessage } = useShorten('https://example.co
   {errorMessage && <p>Error: {errorMessage}</p>}
   {shortenedURL && (
     <p>
-      Original URL: {shortenedURL.submitURL} <br />
+      Original URL: {/* add your state from input handler result */} <br />
       Shortened URL: <a href={shortenedURL.shortenedURL} target="_blank" rel="noopener noreferrer">{shortenedURL.shortenedURL}</a>
     </p>
   )}
 </div>
+```
+
+**another way to render it with crating array**
+
+```jsx
+import React, { useState, useEffect } from 'react';
+import { useShorten } from './useShorten';
+
+export default function URLShortener() {
+  const [inputURL, setInputURL] = useState('');
+  const [urlList, setUrlList] = useState([]);
+  const { shortenedURL, isLoading, errorMessage } = useShorten(inputURL);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (inputURL) {
+      setInputURL(inputURL); // Trigger the shortening process
+    }
+  };
+
+  useEffect(() => {
+    if (shortenedURL) {
+      setUrlList((prevList) => [...prevList, shortenedURL]);
+      setInputURL('');
+    }
+  }, [shortenedURL]);
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <input type="text" placeholder="Enter URL to shorten" value={inputURL} onChange={(e) => setInputURL(e.target.value)} />
+        <button type="submit">Shorten</button>
+      </form>
+
+      {isLoading && <p>Loading...</p>}
+      {errorMessage && <p>Error: {errorMessage}</p>}
+
+      <ul>
+        {urlList.map((urlItem, index) => (
+          <li key={index}>
+            <p>Original URL: {urlItem.submitURL}</p>
+            <p>
+              Shortened URL:{' '}
+              <a href={urlItem.shortenedURL} target="_blank" rel="noopener noreferrer">
+                {urlItem.shortenedURL}
+              </a>
+            </p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 ```
 
 ## ⚙️ Environment Setup
