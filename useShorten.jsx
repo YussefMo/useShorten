@@ -49,7 +49,7 @@ export function useShorten(submitURL) {
             setIsLoading(true);   // Set loading state to true before making API call
             setErrorMessage('');  // Clear any previous errors
 
-            const API_KEY = process.env.REACT_APP_TINYURL_API_KEY;  // API key from environment variables
+            const API_KEY = process.env.REACT_APP_TINYURL_API_KEY;  // API key from environment variables or add you're own key directly here
 
             try {
                 // ----- API Request -----
