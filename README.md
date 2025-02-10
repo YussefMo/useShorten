@@ -1,171 +1,78 @@
-# **useShorten Hook**  
+# useShorten Hook
 
-The `useShorten` hook is a custom React hook designed to handle URL shortening using the **TinyURL API**. It performs URL validation, manages API requests, handles errors, and returns the shortened URL in a clean, reusable way.
+A custom React hook that simplifies URL shortening using the TinyURL API. It handles URL validation, API communication, and error handling, making it easy to integrate URL shortening functionality into your React projects.
 
----
+## 🚀 Features
 
-## **Features**  
-- **URL Validation:** Ensures only valid URLs are processed.  
-- **API Integration:** Shortens URLs using the TinyURL API.  
-- **Error Handling:** Provides clear feedback for network and API errors.  
-- **Loading State:** Displays loading status during API requests.  
-- **Reusable Hook:** Easily integrates into any React component.
+- **Automatic URL validation** to ensure correct formatting.
+- **Error handling** for network issues, invalid URLs, and API errors.
+- **Loading state** management for a smooth user experience.
+- **Clean and reusable** logic for easy integration.
 
----
+## 🔧 Installation
 
-## **Installation**  
+Clone the repository to your local machine:
 
-1. **Add the hook to your project:**  
-   Copy the `useShorten.js` file into your React project.
+```bash
+git clone https://github.com/YussefMo/useShorten.git
+```
 
-2. **Install Axios (if not already installed):**  
-   ```bash
-   npm install axios
-   ```
+Navigate to the project directory:
 
-3. **Add your TinyURL API Key:**  
-   - Create a `.env` file in your project root.  
-   - Add the following line:  
-     ```env
-     REACT_APP_TINYURL_API_KEY=your_api_key_here
-     ```
+```bash
+cd useShorten
+```
 
----
+Then install dependencies Axios (if not already installed):
 
-## **Usage**  
+```bash
+npm install axios
+```
 
-### **Importing the Hook**  
+## 🛠️ Usage
+
+1. **Import the hook** into your React component:
+
 ```javascript
 import { useShorten } from './useShorten';
 ```
 
-### **Using the Hook in a Component**  
-```javascript
-import React, { useState } from 'react';
-import { useShorten } from './useShorten';
-
-export default function URLShortener() {
-    const [inputURL, setInputURL] = useState('');
-    const { shortenedURL, isLoading, errorMessage } = useShorten(inputURL);
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setInputURL(e.target.url.value);
-    };
-
-    return (
-        <div>
-            <h1>URL Shortener</h1>
-            <form onSubmit={handleSubmit}>
-                <input type="text" name="url" placeholder="Enter URL" />
-                <button type="submit">Shorten</button>
-            </form>
-
-            {isLoading && <p>Loading...</p>}
-            {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-            {shortenedURL && <p>Shortened URL: <a href={shortenedURL.shortenedURL} target="_blank" rel="noopener noreferrer">{shortenedURL.shortenedURL}</a></p>}
-        </div>
-    );
-}
-```
-
----
-
-## **Hook API**  
-
-### **`useShorten(submitURL)`**  
-
-#### **Parameters**  
-- `submitURL` **(string)** – The URL to be shortened.
-
-#### **Returns**  
-An object containing the following properties:
-
-| Property        | Type     | Description |
-|-----------------|----------|-------------|
-| `shortenedURL`  | `object \| null` | The shortened URL object `{ submitURL, shortenedURL }`. |
-| `isLoading`     | `boolean` | Indicates if the request is in progress. |
-| `errorMessage`  | `string`  | Contains an error message if an issue occurs. |
-
----
-
-## **Hook Implementation**  
+2. **Use the hook** inside your component:
 
 ```javascript
-import { useEffect, useState } from "react";
-import axios from 'axios';
-
-export function useShorten(submitURL) {
-    const [shortenedURL, setShortenedURL] = useState(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const [errorMessage, setErrorMessage] = useState('');
-
-    function isValidURL(url) {
-        try {
-            new URL(url);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    }
-
-    useEffect(() => {
-        async function fetchData() {
-            if (!submitURL || !isValidURL(submitURL)) {
-                setErrorMessage('Please enter a valid URL.');
-                return;
-            }
-
-            setIsLoading(true);
-            setErrorMessage('');
-
-            const API_KEY = process.env.REACT_APP_TINYURL_API_KEY;
-
-            try {
-                const response = await axios.post(
-                    'https://api.tinyurl.com/create',
-                    { url: submitURL },
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${API_KEY}`,
-                            'Content-Type': 'application/json'
-                        }
-                    }
-                );
-
-                setShortenedURL({ submitURL, shortenedURL: response.data.data.tiny_url });
-            } catch (error) {
-                if (error.request) {
-                    setErrorMessage('Network Error: You are offline or the server is unreachable.');
-                } else if (error.response) {
-                    setErrorMessage(`HTTP Error: ${error.response.status} - ${error.response.data.message}`);
-                } else {
-                    setErrorMessage(`An error occurred: ${error.message}`);
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
-        if (submitURL && isValidURL(submitURL)) {
-            fetchData();
-        }
-
-        return () => {
-            setShortenedURL(null);
-            setIsLoading(false);
-            setErrorMessage('');
-        };
-    }, [submitURL]);
-
-    return { shortenedURL, isLoading, errorMessage };
-}
+const { shortenedURL, isLoading, errorMessage } = useShorten('https://example.com');
 ```
 
----
+3. **Render the output** in your JSX:
 
-## **Error Handling**  
-The hook handles different types of errors:  
-- **Network Errors:** Displayed when the user is offline or the server is unreachable.  
-- **API Errors:** Returns HTTP status codes and error messages for API-specific issues.  
-- **Unexpected Errors:** Captures other exceptions (e.g., response parsing errors).
+```jsx
+<div>
+  {isLoading && <p>Loading...</p>}
+  {errorMessage && <p>Error: {errorMessage}</p>}
+  {shortenedURL && (
+    <p>
+      Original URL: {shortenedURL.submitURL} <br />
+      Shortened URL: <a href={shortenedURL.shortenedURL} target="_blank" rel="noopener noreferrer">{shortenedURL.shortenedURL}</a>
+    </p>
+  )}
+</div>
+```
+
+## ⚙️ Environment Setup
+
+1. Get your **TinyURL API key** from [TinyURL Developer Portal](https://tinyurl.com/developer).
+2. Create a `.env` file in your project root and add the following or add add you're own key directly as string:
+
+```
+REACT_APP_TINYURL_API_KEY=your_api_key_here
+```
+
+## 📝 API Reference
+
+- **Endpoint:** `https://api.tinyurl.com/create`
+- **Method:** `POST`
+- **Headers:**
+  - `Authorization: Bearer YOUR_API_KEY`
+  - `Content-Type: application/json`
+- **Body Parameters:**
+  - `url`: The URL to shorten.
